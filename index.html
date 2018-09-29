@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Constanta 1960s</title>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.2.0/css/ol.css" type="text/css">
+	<link rel="stylesheet" href="./css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+  </head>
+  <body>
+	<input id="swipe" type="range" style="width: 100%">
+    <div id="map" class="map"  style="height: 80%"></div>    
+    <script>
+      var c66 = new ol.layer.Image({
+            source: new ol.source.ImageStatic({
+              attributions: '© <a href="https://www.usgs.gov/">Data courtesy of the U.S. Geological Survey</a>',
+              url: './img/c66.jpg',
+              projection: 'EPSG:3857',
+              imageExtent: [3174427.9419623,5480466.78511541,3192242.10276188,5507554.98468331]
+            }),
+			extent: [3174427.9419623,5480466.78511541,3192242.10276188,5507554.98468331]
+          });
+      var bing = new ol.layer.Tile({
+        source: new ol.source.BingMaps({
+          key: 'AiUAWTBRWX6RhDRTCshXTIuQrkxw41Uj6GFsubwCDvrdwApnL4aqagWBdAHj1Fwl',
+          imagerySet: 'Aerial'
+        }),
+		extent: [3174427.9419623,5480466.78511541,3192242.10276188,5507554.98468331]
+      });
+
+      var map = new ol.Map({
+        layers: [c66, bing],
+        target: 'map',
+        controls: ol.control.defaults({
+          attributionOptions: {
+            collapsible: false
+          }
+        }),
+        view: new ol.View({
+          center: [3184000,5493000],
+          zoom: 14
+        })
+      });
+
+      var swipe = document.getElementById('swipe');
+
+      bing.on('precompose', function(event) {
+        var ctx = event.context;
+        var width = ctx.canvas.width * (swipe.value / 100);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height);
+        ctx.clip();
+      });
+
+      bing.on('postcompose', function(event) {
+        var ctx = event.context;
+        ctx.restore();
+      });
+
+      swipe.addEventListener('input', function() {
+        map.render();
+      }, false);
+    </script>
+  </body>
+</html>
